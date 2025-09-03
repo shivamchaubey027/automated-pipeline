@@ -30,11 +30,11 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker stop automated-pipeline || true
-            docker rm automated-pipeline || true
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-            docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
-            docker run -d -p 3000:3000 --name automated-pipeline ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+            /usr/bin/docker stop automated-pipeline || true
+            /usr/bin/docker rm automated-pipeline || true
+            /usr/bin/aws ecr get-login-password --region us-east-1 | /usr/bin/docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+            /usr/bin/docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+            /usr/bin/docker run -d -p 3000:3000 --name automated-pipeline ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
           script_stop: true
     
     env:
