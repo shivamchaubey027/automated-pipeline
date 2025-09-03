@@ -93,3 +93,7 @@ resource "aws_key_pair" "key" {
   key_name = "my-aws-key"
   public_key = file("./my-key.pub")
 }
+
+output "instance_public_ip" {
+  value = aws_instance.ec2.public_ip
+}
