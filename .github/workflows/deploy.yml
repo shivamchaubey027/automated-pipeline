@@ -32,9 +32,10 @@ jobs:
           script: |
             docker stop automated-pipeline || true
             docker rm automated-pipeline || true
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
             docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
             docker run -d -p 3000:3000 --name automated-pipeline ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
+          script_stop: true
     
     env:
       ECR_REPOSITORY: automated-pipeline-repo
