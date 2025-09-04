@@ -2,33 +2,50 @@
 
 ![CI/CD Workflow Status](https://github.com/shivamchaubey027/automated-pipeline/actions/workflows/deploy.yml/badge.svg)
 
-It has always been an issue for me while building an application. The old way—manually containerizing it, SSHing into the EC2 server, and pushing it on there—is slow, repetitive, and just doesn't scale. I learned about CI/CD pipelines as a way to automate the whole process of getting an application into production.
+Building applications has always been a challenge for me, particularly when it comes to deployment. The traditional approach I used to follow was tedious: manually containerizing the application, SSHing into an EC2 server, and pushing everything manually. This process was not only slow and repetitive but also didn't go well as projects grew in complexity.
+
+That's when I finally thought of CI/CD pipelines. I realized this was exactly what I needed to automate the entire production deployment process, eliminating the manual work and potential for human error.
 
 ---
 
-## How It Works
+## Architecture Overview
 
-The whole process is like a Rube Goldberg machine that starts with a simple `git push`.
+The pipeline I built follows a straightforward workflow that begins with a simple `git push` and ends with the application running in production. Here's how the entire system works:
 
-### 1. Building the Field (Infrastructure as Code with Terraform)
+## Infrastructure Setup with Terraform
 
-First, you have to build the entire infrastructure without clicking a single button on the AWS website. I used Terraform to define everything as code. This is like asking for an empty ground, putting up a fence, and building roads before any of the real work starts. The Terraform code automatically provisions:
+Before automating deployments, I needed to establish a solid foundation. Instead of manually configuring AWS resources through the console, I used Terraform to define everything as Infrastructure as Code (IaC). This approach ensures reproducibility and makes the entire setup version-controlled.
 
-* A **VPC** (our private field on AWS).
-* A public **subnet** (the specific plot of land for our server).
-* An **EC2 instance** (the server that will host the application).
-* An **ECR repository** (a private place to keep our Docker images).
-* **Security Groups** (the security guards who only let the right traffic in).
+The Terraform configuration provisions the following components:
 
-### 2. Packaging the App (Containerization with Docker)
+* **VPC** - Creates an isolated network environment for the application
+* **Public subnet** - Defines the network segment where the EC2 instance resides  
+* **EC2 instance** - The compute resource that hosts the containerized application
+* **ECR repository** - A private Docker registry for storing application images
+* **Security Groups** - Network access control rules that restrict traffic to authorized sources only
 
-The Node.js application is packaged into a lightweight, consistent container using a **multi-stage Dockerfile**. This ensures the app runs the same way everywhere and keeps the final image small and secure.
+## Application Containerization
 
-### 3. The Automation Brain (The `deploy.yml` Workflow)
+The Node.js application is packaged using Docker with a multi-stage Dockerfile approach. This strategy keeps the final production image lightweight while ensuring consistent runtime behavior across different environments.
 
-This is where the magic happens. A GitHub Actions workflow file (`deploy.yml`) acts as the brain for the whole operation. Once you `git push` your code, it kicks off a series of automated steps:
+## Automated Deployment Pipeline
 
-* **Build & Push:** It builds a new Docker image from the latest code and pushes it to our private ECR repository.
-* **Deploy:** It then securely SSHes into the EC2 instance, pulls the new image from ECR, stops the old container, and starts the new one, making the update live instantly.
+The core automation is handled by a GitHub Actions workflow defined in `deploy.yml`. This workflow executes whenever code is pushed to the repository and performs the following steps:
 
-The result is a complete "Git Push to Production" pipeline. Now, instead of a painful manual process, I can deploy new features just by pushing my code.
+### Build and Push Phase
+1. Builds a new Docker image incorporating the latest code changes
+2. Tags the image appropriately for versioning
+3. Pushes the image to the private ECR repository
+
+### Deployment Phase  
+1. Establishes a secure SSH connection to the EC2 instance
+2. Pulls the newly built image from ECR
+3. Stops the currently running container
+4. Starts a new container with the updated image
+5. Verifies the deployment was successful
+
+## Results
+
+This setup has changed my development workflow completely. What used to be a manual, error-prone process taking several minutes now happens automatically within seconds of pushing code. The entire "Git Push to Production" pipeline eliminates the operational overhead and allows me to focus on building features rather than managing deployments.
+
+The combination of Infrastructure as Code, containerization, and automated CI/CD has made my development process significantly more reliable and efficient.
