@@ -11,7 +11,7 @@ That's when I finally thought of CI/CD pipelines. I realized this was exactly wh
 ## Architecture Overview
  
 The pipeline I built follows a straightforward workflow that begins with a simple `git push` and ends with the application running in production. Here's how the entire system works:
-
+![CICD](./cicd.png)
 
 ## Infrastructure Setup with Terraform
 
